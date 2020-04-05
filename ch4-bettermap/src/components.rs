@@ -1,7 +1,6 @@
+use rltk::RGB;
 use specs::prelude::*;
 use specs_derive::*;
-use rltk::RGB;
-
 
 /// Entity Position, allows drawing to screen
 #[derive(Component)] // makes `Position` a Specs component

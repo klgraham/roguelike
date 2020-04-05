@@ -6,6 +6,8 @@ extern crate specs_derive;
 
 mod components;
 pub use components::*;
+pub mod rect;
+use rect::Rect;
 mod map;
 pub use map::*;
 mod player;
@@ -63,7 +65,7 @@ fn main() {
     gs.ecs.register::<Renderable>();
     gs.ecs.register::<Player>();
 
-    gs.ecs.insert(new_map());
+    gs.ecs.insert(new_map_rooms_and_corridors());
 
     // Now we can create entities with positions that can also be drawn on the screen
     gs.ecs
