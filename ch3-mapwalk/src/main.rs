@@ -38,7 +38,8 @@ struct Player {}
 // PartialEq gives us ==
 #[derive(PartialEq, Copy, Clone)]
 enum TileType {
-    Wall, Floor
+    Wall,
+    Floor,
 }
 
 // Takes position (x, y) and returns a vector index
@@ -74,7 +75,6 @@ fn new_map() -> Vec<TileType> {
         if i != xy_idx(40, 25) {
             map[i] = TileType::Wall;
         }
-        
     }
 
     map
@@ -88,10 +88,22 @@ fn draw_map(map: &[TileType], ctx: &mut Rltk) {
         // Render a tile depending on tile type
         match tile {
             TileType::Floor => {
-                ctx.set(x, y, RGB::from_f32(0.5, 0.5, 0.5), RGB::from_f32(0., 0., 0.), rltk::to_cp437('.'));            
+                ctx.set(
+                    x,
+                    y,
+                    RGB::from_f32(0.5, 0.5, 0.5),
+                    RGB::from_f32(0., 0., 0.),
+                    rltk::to_cp437('.'),
+                );
             }
             TileType::Wall => {
-                ctx.set(x, y, RGB::from_f32(0., 1., 0.), RGB::from_f32(0., 0., 0.), rltk::to_cp437('#'));
+                ctx.set(
+                    x,
+                    y,
+                    RGB::from_f32(0., 1., 0.),
+                    RGB::from_f32(0., 0., 0.),
+                    rltk::to_cp437('#'),
+                );
             }
         }
 
@@ -119,6 +131,7 @@ fn try_move_player(dx: i32, dy: i32, ecs: &mut World) {
     for (_player, pos) in (&mut players, &mut positions).join() {
         let destination = xy_idx(pos.x + dx, pos.y + dy);
 
+        // Can't walk through walls
         if map[destination] != TileType::Wall {
             pos.x = min(79, max(0, pos.x + dx));
             pos.y = min(49, max(0, pos.y + dy));
@@ -139,11 +152,9 @@ fn player_input(gs: &mut State, ctx: &mut Rltk) {
             // VirtualKeyCode::Up => try_move_player(0, -1, &mut gs.ecs),
             // VirtualKeyCode::Down => try_move_player(0, 1, &mut gs.ecs),
             _ => {} // do nothing if any other key is hit
-        }
+        },
     }
 }
-
-
 
 impl GameState for State {
     fn tick(&mut self, ctx: &mut Rltk) {
@@ -152,20 +163,19 @@ impl GameState for State {
 
         player_input(self, ctx);
         self.run_systems();
-        
+
         let map = self.ecs.fetch::<Vec<TileType>>();
         draw_map(&map, ctx);
-        
+
         // asks the ECS for read access to where the Position components are stored
         let positions = self.ecs.read_storage::<Position>();
         let renderables = self.ecs.read_storage::<Renderable>();
-        
+
         // The join call only returns entities that have both
         for (pos, render) in (&positions, &renderables).join() {
             // sets a single terminal character to specific glyphs/colors
             ctx.set(pos.x, pos.y, render.fg, render.bg, render.glyph);
         }
-
     }
 }
 
@@ -201,9 +211,8 @@ fn main() {
             fg: RGB::named(rltk::YELLOW),
             bg: RGB::named(rltk::BLACK),
         })
-        .with(Player{})
+        .with(Player {})
         .build();
-
 
     rltk::main_loop(context, gs);
 }
