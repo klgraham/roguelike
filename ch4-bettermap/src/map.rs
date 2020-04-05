@@ -56,7 +56,7 @@ fn add_room_to_map(room: &Rect, map: &mut [TileType]) {
     }
 }
 
-pub fn new_map_rooms_and_corridors() -> Vec<TileType> {
+pub fn new_map_rooms_and_corridors() -> (Vec<Rect>, Vec<TileType>) {
     let mut map = vec![TileType::Wall; 80 * 50];
     let mut rooms: Vec<Rect> = Vec::new();
 
@@ -106,7 +106,7 @@ pub fn new_map_rooms_and_corridors() -> Vec<TileType> {
         }
     }
 
-    map
+    (rooms, map)
 }
 
 fn add_horizontal_tunnel(map: &mut [TileType], x1: i32, x2: i32, y: i32) {
