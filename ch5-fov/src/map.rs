@@ -12,15 +12,23 @@ pub enum TileType {
     Floor,
 }
 
+/// Map
 pub struct Map {
+    // vector of all tiles in the map
     pub tiles: Vec<TileType>,
+    // the rooms in the map
     pub rooms: Vec<Rect>,
     pub width: i32,
     pub height: i32,
+    // tiles that have been visited
+    // once these are set to true, they will not change again
     pub revealed_tiles: Vec<bool>,
+    // tiles that are currently visible
+    // these can change back and forth
     pub visible_tiles: Vec<bool>,
 }
 
+// These let me use subscripting
 impl Index<(i32, i32)> for Map {
     type Output = TileType;
 
@@ -50,6 +58,7 @@ impl Map {
         (y as usize * self.width as usize) + x as usize
     }
 
+    // Given a room, update the tiles to be floor and not walls
     fn apply_room_to_map(&mut self, room: &Rect) {
         for y in (room.y1 + 1)..=room.y2 {
             for x in (room.x1 + 1)..=room.x2 {

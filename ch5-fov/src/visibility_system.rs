@@ -20,7 +20,7 @@ impl<'a> System<'a> for VisibilitySystem {
         let (mut map, entities, mut viewshed, pos, player) = data;
 
         for (ent, viewshed, pos) in (&entities, &mut viewshed, &pos).join() {
-            viewshed.dirty = false;
+            viewshed.dirty = false; // don't need to update this tile, unless...
             viewshed.visible_tiles.clear();
             viewshed.visible_tiles = field_of_view(Point::new(pos.x, pos.y), viewshed.range, &*map);
             viewshed
