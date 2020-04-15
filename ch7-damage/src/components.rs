@@ -48,3 +48,49 @@ pub struct Name {
 
 #[derive(Component, Debug)]
 pub struct BlocksTile {}
+
+#[derive(Component, Debug)]
+pub struct CombatStats {
+    pub max_hp: i32,
+    pub hp: i32,
+    pub defense: i32,
+    pub power: i32,
+}
+
+impl CombatStats {
+    pub fn new(max_hp: i32, hp: i32, defense: i32, power: i32) -> CombatStats {
+        CombatStats {
+            max_hp,
+            hp,
+            defense,
+            power,
+        }
+    }
+}
+
+/// Component that gives an entity the ability to do mêlée damage
+#[derive(Component, Debug, Clone)]
+pub struct CanMelee {
+    pub target: Entity,
+}
+
+/// Component that tracks the incoming damage suffered by an entity
+#[derive(Component, Debug)]
+pub struct SuffersDamage {
+    pub amount: Vec<i32>,
+}
+
+impl SuffersDamage {
+    pub fn new_damage(store: &mut WriteStorage<SuffersDamage>, victim: Entity, amount: i32) {
+        if let Some(incoming_damage) = store.get_mut(victim) {
+            incoming_damage.amount.push(amount);
+        } else {
+            let damage = SuffersDamage {
+                amount: vec![amount],
+            };
+            store
+                .insert(victim, damage)
+                .expect("Unable to insert damage.");
+        }
+    }
+}

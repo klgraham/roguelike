@@ -28,6 +28,8 @@ pub struct Map {
     pub visible_tiles: Vec<bool>,
     // keep track of which tiles are able to be occupied
     pub blocked: Vec<bool>,
+    // track what is on each tile
+    pub tile_content: Vec<Vec<Entity>>,
 }
 
 // These let me use subscripting
@@ -52,7 +54,7 @@ impl IndexMut<(i32, i32)> for Map {
 }
 
 impl Map {
-    fn contains(&self, x: i32, y: i32) -> bool {
+    pub fn contains(&self, x: i32, y: i32) -> bool {
         x > 0 && x < self.width && y > 0 && y < self.height
     }
 
@@ -85,9 +87,17 @@ impl Map {
         }
     }
 
+    /// Sets each tile that is a wall tile to blocked
     pub fn populate_blocked(&mut self) {
         for (i, tile) in self.tiles.iter_mut().enumerate() {
             self.blocked[i] = *tile == TileType::Wall;
+        }
+    }
+
+    /// Clears the index that tracks what is on each tile
+    pub fn clear_content_index(&mut self) {
+        for content in self.tile_content.iter_mut() {
+            content.clear();
         }
     }
 
@@ -110,6 +120,7 @@ impl Map {
             revealed_tiles: vec![false; 80 * 50],
             visible_tiles: vec![false; 80 * 50],
             blocked: vec![false; 80 * 50],
+            tile_content: vec![Vec::new(); 80 * 50],
         };
 
         const MAX_ROOMS: i32 = 30;

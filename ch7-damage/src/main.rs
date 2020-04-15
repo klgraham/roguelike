@@ -4,19 +4,19 @@ use rltk::{Console, GameState, Point, Rltk, RGB};
 use specs::prelude::*;
 
 mod components;
-pub use components::*;
-pub mod rect;
+use components::*;
+mod rect;
 use rect::Rect;
 mod map;
-pub use map::*;
+use map::*;
 mod player;
 use player::*;
-mod visibility_system;
-use visibility_system::VisibilitySystem;
-mod monster_ai_system;
-use monster_ai_system::MonsterAI;
-mod map_indexing_system;
-use map_indexing_system::MapIndexingSystem;
+mod systems;
+use systems::damage_system::{delete_the_dead, DamageSystem};
+use systems::map_indexing_system::MapIndexingSystem;
+use systems::melee_combat_system::MeleeCombatSystem;
+use systems::monster_ai_system::MonsterAI;
+use systems::visibility_system::VisibilitySystem;
 
 // Allows us to "pause" the game
 #[derive(PartialEq, Copy, Clone)]
@@ -45,6 +45,12 @@ impl State {
         let mut map_index = MapIndexingSystem {};
         map_index.run_now(&self.ecs);
 
+        let mut melee = MeleeCombatSystem {};
+        melee.run_now(&self.ecs);
+
+        let mut damage = DamageSystem {};
+        damage.run_now(&self.ecs);
+
         self.ecs.maintain();
     }
 }
@@ -66,6 +72,8 @@ impl GameState for State {
         } else {
             self.run_state = player_input(self, ctx);
         }
+
+        delete_the_dead(&mut self.ecs);
 
         draw_map(&self.ecs, ctx);
 
@@ -106,6 +114,9 @@ fn main() {
     gs.ecs.register::<Viewshed>();
     gs.ecs.register::<Name>();
     gs.ecs.register::<BlocksTile>();
+    gs.ecs.register::<CombatStats>();
+    gs.ecs.register::<CanMelee>();
+    gs.ecs.register::<SuffersDamage>();
 
     let map: Map = Map::new_map_rooms_and_corridors();
 
@@ -128,6 +139,7 @@ fn main() {
         .with(Name {
             name: "Hawk Darkstone".to_string(),
         })
+        .with(CombatStats::new(30, 30, 2, 5))
         .build();
 
     // Add a monster to the center of each room
@@ -168,6 +180,7 @@ fn main() {
             .with(Name {
                 name: format!("{} #{}", &name, i),
             })
+            .with(CombatStats::new(16, 16, 1, 4))
             .with(BlocksTile {})
             .build();
     }

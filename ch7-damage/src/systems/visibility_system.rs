@@ -1,9 +1,9 @@
 // A system to handle map visibility for Entities
-// extern crate specs;
-use super::{Map, Player, Position, Viewshed};
-use specs::prelude::*;
-// extern crate rltk;
+
+use crate::components::{Player, Position, Viewshed};
+use crate::map::Map;
 use rltk::{field_of_view, Point};
+use specs::prelude::*;
 
 pub struct VisibilitySystem {}
 

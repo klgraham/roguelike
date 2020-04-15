@@ -1,6 +1,7 @@
 // Behavior for monsters
 
-use super::{Map, Monster, Name, Position, Viewshed};
+use crate::components::{Monster, Name, Position, Viewshed};
+use crate::map::Map;
 use rltk::{console, DistanceAlg, Point};
 use specs::prelude::*;
 
